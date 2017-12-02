@@ -1,0 +1,13 @@
+Chain:
+- Image: 'busybox'
+  Command: 'cat'
+  Arguments:
+- Image: 'busybox'
+  Command: 'grep'
+  Arguments:
+          - 'wrong'
+- Image: 'busybox'
+  Command: 'xargs'
+  Arguments:
+          - '-n'
+          - '3'
