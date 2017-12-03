@@ -47,7 +47,7 @@ func (e Etcd) setLink(l chain.Link) error {
 		return err
 	}
 	fmt.Printf("Setting Link %v", l.Id())
-	_, err = e.kapi.Create(context.Background(), fmt.Sprintf(worker, l.Id()), y)
+	_, err = e.kapi.Set(context.Background(), fmt.Sprintf(worker, l.Id()), y, &client.SetOptions{PrevExist: client.PrevIgnore})
 	return err
 }
 
