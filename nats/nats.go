@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"time"
@@ -26,13 +27,15 @@ func New(url string) (Nats, error) {
 	return n, err
 }
 
-func (n *Nats) Register(key string, h Handler) {
+func (n *Nats) Register(key string, h Handler) error {
 	w := wrapper{h, n}
-	n.nats.QueueSubscribe(key, key, w.MsgHandler)
+	_, err := n.nats.QueueSubscribe(key, key, w.MsgHandler)
+	return err
 }
 
 func (n *Nats) Send(key string, msg []byte) ([]byte, error) {
-	m, err := n.nats.Request(key, msg, 50*time.Millisecond)
+	fmt.Printf("entering into %v\n", key)
+	m, err := n.nats.Request(key, msg, 5*time.Second)
 	if err != nil {
 		return nil, err
 	}

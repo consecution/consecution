@@ -7,10 +7,10 @@ Chain:
   Command: 'grep'
   Name: 'grep'
   Arguments:
-          - 'data'
+          - 'wrong'
 - Image: 'busybox'
   Command: 'xargs'
   Name: 'xargs'
   Arguments:
           - '-n'
-          - '1'
+          - '3'

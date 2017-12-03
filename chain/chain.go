@@ -22,6 +22,11 @@ type Link struct {
 	Name string `yaml:"Name"`
 	// Image docker image full url
 	Image string `yaml:"Image"`
+	// Constraints
+	Constraints struct {
+		Memory string  `yaml:"Memory"`
+		CPU    float64 `yaml:"CPU"`
+	} `yaml:"Constraints"`
 	// Command to execute
 	Command string `yaml:"Command"`
 	// Arguments to command

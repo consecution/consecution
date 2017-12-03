@@ -2,15 +2,24 @@ Chain:
 - Image: 'busybox'
   Command: 'cat'
   Name: 'cat'
+  Constraints:
+    Memory: 20
+    CPU: 0.5
   Arguments:
 - Image: 'busybox'
   Command: 'grep'
   Name: 'grep'
+  Constraints:
+    Memory: 20
+    CPU: 0.5
   Arguments:
           - 'wrong'
 - Image: 'busybox'
   Command: 'xargs'
   Name: 'xargs'
+  Constraints:
+    Memory: 20
+    CPU: 0.5
   Arguments:
           - '-n'
           - '3'

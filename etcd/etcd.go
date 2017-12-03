@@ -46,12 +46,11 @@ func (e Etcd) setLink(l chain.Link) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Setting Link %v", l.Id())
 	_, err = e.kapi.Set(context.Background(), fmt.Sprintf(worker, l.Id()), y, &client.SetOptions{PrevExist: client.PrevIgnore})
 	return err
 }
 
-func (e Etcd) GetLinks() (chain.Chain, error) {
+func (e Etcd) GetChain() (chain.Chain, error) {
 	var c chain.Chain
 	r, err := e.kapi.Get(context.Background(), workers, &client.GetOptions{Recursive: true})
 	if err != nil {
