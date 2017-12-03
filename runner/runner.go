@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"os/exec"
 	"sync"
 	"time"
@@ -14,8 +15,14 @@ import (
 )
 
 var (
-	DefaultQue = 2
+	DefaultQue         = 2
+	ContainerDirectory = ""
 )
+
+func init() {
+	home := os.Getenv("HOME")
+	ContainerDirectory = fmt.Sprintf("%v/native_conatiners", home)
+}
 
 type Runner struct {
 	nats    nats.Nats
@@ -49,7 +56,7 @@ func New(natsurl string, etcdurls []string) (Runner, error) {
 func (r *Runner) BuildWorkers() error {
 	for _, l := range r.chain.Links {
 		w := NewWorker(l, &r.que)
-		err := GetImage(l.Image)
+		err := GetImage(l)
 		if err != nil {
 			return err
 		}
@@ -185,8 +192,40 @@ func NewCommand(l chain.Link) (*Command, error) {
 
 }
 
-func GetImage(image string) error {
-	fmt.Printf("pulling %v\n", image)
-	cmd := exec.Command("docker", "pull", image)
-	return cmd.Run()
+func GetImage(l chain.Link) error {
+	targetdir := fmt.Sprintf("%v/%v", ContainerDirectory, l.Image)
+	_, err := os.Stat(targetdir)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if err == nil {
+		fmt.Printf("Already done for  %v\n", l.Image)
+		return err
+	}
+	fmt.Printf("pulling %v\n", l.Image)
+	cmd := exec.Command("docker", "pull", l.Image)
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("creating container %v\n", l.Image)
+	cmd = exec.Command("docker", "create", "--name", l.Image, l.Image)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("exporting container %v\n", l.Image)
+	tarfile := fmt.Sprintf("/tmp/%v.tar", l.Image)
+	cmd = exec.Command("docker", "export", "-o", tarfile, l.Image)
+	err = cmd.Run()
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(targetdir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("untarring container %v\n", l.Image)
+	cmd = exec.Command("tar", "xf", tarfile, "-C", targetdir)
+	err = cmd.Run()
+	return err
 }
