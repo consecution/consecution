@@ -18,6 +18,8 @@ var (
 
 // Link is one command in a chain
 type Link struct {
+	// Name for debugging purposes
+	Name string `yaml:"Name"`
 	// Image docker image full url
 	Image string `yaml:"Image"`
 	// Command to execute
