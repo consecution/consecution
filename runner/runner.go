@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/consecution/consecution/chain"
@@ -157,24 +158,7 @@ type Command struct {
 func NewCommand(l chain.Link) (*Command, error) {
 	var c Command
 	var err error
-	/*
-		constr := make([]string, 0)
-		if l.Constraints.CPU != 0 {
-			constr = []string{"--cpu", strconv.FormatFloat(l.Constraints.CPU, 'f', -1, 32)}
-		}
-		if l.Constraints.Memory != "" {
-			constr = []string{"-m", l.Constraints.Memory}
-		}
-	*/
-	cmdline := []string{
-		"run",
-		"--rm",
-		"-i",
-		l.Image,
-		l.Command,
-	}
-	cmdline = append(cmdline, l.Arguments...)
-	c.cmd = exec.Command("docker", cmdline...)
+	c.cmd = exec.Command(fmt.Sprintf("/bin/%v", l.Command), l.Arguments...)
 	c.in, err = c.cmd.StdinPipe()
 	if err != nil {
 		return &c, err
@@ -187,6 +171,13 @@ func NewCommand(l chain.Link) (*Command, error) {
 	if err != nil {
 		return &c, err
 	}
+	targetdir := fmt.Sprintf("%v/%v", ContainerDirectory, l.Image)
+	c.cmd.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+		Chroot:     targetdir,
+	}
+	c.cmd.Dir = "/"
+	c.cmd.Env = []string{"PATH:/bin"}
 	err = c.cmd.Start()
 	return &c, err
 
