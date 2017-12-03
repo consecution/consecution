@@ -2,7 +2,6 @@ Chain:
 - Image: 'busybox'
   Command: 'cat'
   Name: 'cat'
-  Arguments:
 - Image: 'busybox'
   Command: 'grep'
   Name: 'grep'

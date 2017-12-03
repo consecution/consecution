@@ -6,11 +6,11 @@ import (
 	"log"
 	"os/exec"
 	"sync"
+	"time"
 
 	"github.com/consecution/consecution/chain"
 	"github.com/consecution/consecution/etcd"
 	"github.com/consecution/consecution/nats"
-	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -113,7 +113,8 @@ func (w *Worker) Handle(in io.Reader, out io.Writer, er io.Writer) error {
 	c := w.que[0]
 	w.que = w.que[1:]
 	w.lock.Unlock()
-	fmt.Println("popped")
+	fmt.Println("popped, running")
+	start := time.Now()
 	_, err := io.Copy(c.in, in)
 	if err != nil {
 		log.Println(err)
@@ -129,7 +130,7 @@ func (w *Worker) Handle(in io.Reader, out io.Writer, er io.Writer) error {
 	}
 	fmt.Println("running command")
 	err = c.cmd.Wait()
-	fmt.Println("request finished")
+	fmt.Printf("request finished in %v\n", time.Since(start))
 	go func() {
 		err := w.UpdateQue()
 		if err != nil {
@@ -166,7 +167,6 @@ func NewCommand(l chain.Link) (*Command, error) {
 		l.Command,
 	}
 	cmdline = append(cmdline, l.Arguments...)
-	spew.Dump(cmdline)
 	c.cmd = exec.Command("docker", cmdline...)
 	c.in, err = c.cmd.StdinPipe()
 	if err != nil {
