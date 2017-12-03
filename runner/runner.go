@@ -10,6 +10,7 @@ import (
 	"github.com/consecution/consecution/chain"
 	"github.com/consecution/consecution/etcd"
 	"github.com/consecution/consecution/nats"
+	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -74,7 +75,7 @@ func (r *Runner) SetBuffer(i int) {
 
 type Worker struct {
 	link   chain.Link
-	que    []Command
+	que    []*Command
 	lock   *sync.Mutex
 	buffer *int
 }
@@ -83,7 +84,7 @@ func NewWorker(l chain.Link, i *int) Worker {
 	w := Worker{
 		buffer: i,
 		lock:   &sync.Mutex{},
-		que:    make([]Command, 0),
+		que:    make([]*Command, 0),
 		link:   l,
 	}
 	return w
@@ -91,7 +92,7 @@ func NewWorker(l chain.Link, i *int) Worker {
 
 func (w *Worker) UpdateQue() error {
 	i := len(w.que)
-	for i < *w.buffer {
+	for i < 2 {
 		c, err := NewCommand(w.link)
 		if err != nil {
 			return err
@@ -108,19 +109,33 @@ func (w *Worker) Handle(in io.Reader, out io.Writer, er io.Writer) error {
 	fmt.Println("received request")
 	fmt.Println(w.link.Name)
 	w.lock.Lock()
+	fmt.Println("popping command")
 	c := w.que[0]
 	w.que = w.que[1:]
 	w.lock.Unlock()
+	fmt.Println("popped")
+	_, err := io.Copy(c.in, in)
+	if err != nil {
+		log.Println(err)
+	}
+	c.in.Close()
+	_, err = io.Copy(out, c.out)
+	if err != nil {
+		log.Println(err)
+	}
+	_, err = io.Copy(er, c.err)
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println("running command")
+	err = c.cmd.Wait()
+	fmt.Println("request finished")
 	go func() {
 		err := w.UpdateQue()
 		if err != nil {
 			log.Println(err)
 		}
 	}()
-	io.Copy(c.in, in)
-	io.Copy(out, c.out)
-	io.Copy(er, c.err)
-	err := c.cmd.Wait()
 	return err
 }
 
@@ -131,7 +146,7 @@ type Command struct {
 	err io.ReadCloser
 }
 
-func NewCommand(l chain.Link) (Command, error) {
+func NewCommand(l chain.Link) (*Command, error) {
 	var c Command
 	var err error
 	/*
@@ -143,25 +158,35 @@ func NewCommand(l chain.Link) (Command, error) {
 			constr = []string{"-m", l.Constraints.Memory}
 		}
 	*/
-	c.cmd = exec.Command("docker", "run", "--rm", "-i", l.Image, l.Command, "'test'")
+	cmdline := []string{
+		"run",
+		"--rm",
+		"-i",
+		l.Image,
+		l.Command,
+	}
+	cmdline = append(cmdline, l.Arguments...)
+	spew.Dump(cmdline)
+	c.cmd = exec.Command("docker", cmdline...)
 	c.in, err = c.cmd.StdinPipe()
 	if err != nil {
-		return c, err
+		return &c, err
 	}
 	c.out, err = c.cmd.StdoutPipe()
 	if err != nil {
-		return c, err
+		return &c, err
 	}
 	c.err, err = c.cmd.StderrPipe()
 	if err != nil {
-		return c, err
+		return &c, err
 	}
 	err = c.cmd.Start()
-	return c, err
+	return &c, err
 
 }
 
 func GetImage(image string) error {
+	fmt.Printf("pulling %v\n", image)
 	cmd := exec.Command("docker", "pull", image)
 	return cmd.Run()
 }
