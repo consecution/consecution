@@ -1,14 +1,14 @@
 Chain:
 - Image: 'busybox'
-  Command: 'cat'
+  Command: '/bin/cat'
   Name: 'cat'
 - Image: 'busybox'
-  Command: 'grep'
+  Command: '/bin/grep'
   Name: 'grep'
   Arguments:
           - 'data'
 - Image: 'busybox'
-  Command: 'xargs'
+  Command: '/bin/xargs'
   Name: 'xargs'
   Arguments:
           - '-n'

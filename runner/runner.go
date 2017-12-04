@@ -158,7 +158,7 @@ type Command struct {
 func NewCommand(l chain.Link) (*Command, error) {
 	var c Command
 	var err error
-	c.cmd = exec.Command(fmt.Sprintf("/bin/%v", l.Command), l.Arguments...)
+	c.cmd = exec.Command(l.Command, l.Arguments...)
 	c.in, err = c.cmd.StdinPipe()
 	if err != nil {
 		return &c, err
@@ -173,11 +173,15 @@ func NewCommand(l chain.Link) (*Command, error) {
 	}
 	targetdir := fmt.Sprintf("%v/%v", ContainerDirectory, l.Image)
 	c.cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
-		Chroot:     targetdir,
+		//Cloneflags: syscall.CLONE_NEWUTS | syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+		Cloneflags: syscall.CLONE_NEWUSER | syscall.CLONE_NEWUTS |
+			syscall.CLONE_NEWPID | syscall.CLONE_NEWNS,
+		Credential:  &syscall.Credential{Uid: 0, Gid: 0},
+		UidMappings: []syscall.SysProcIDMap{{ContainerID: 0, HostID: os.Getuid(), Size: 1}},
+		GidMappings: []syscall.SysProcIDMap{{ContainerID: 0, HostID: os.Getgid(), Size: 1}},
+		Chroot:      targetdir,
 	}
 	c.cmd.Dir = "/"
-	c.cmd.Env = []string{"PATH:/bin"}
 	err = c.cmd.Start()
 	return &c, err
 
