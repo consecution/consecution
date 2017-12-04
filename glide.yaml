@@ -1,0 +1,7 @@
+package: github.com/consecution/consecution
+import:
+- package: github.com/coreos/etcd
+  subpackages:
+  - client
+- package: github.com/nats-io/go-nats
+- package: gopkg.in/yaml.v2
