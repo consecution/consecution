@@ -83,7 +83,7 @@ When a request comes in from Nats, the runner finds the command queue by the lin
 
 ## Demo
 ```
-docker-compose build .
+docker-compose build
 docker-compose up
 ```
 If everything is up and running
