@@ -12,7 +12,7 @@ import (
 func main() {
 	etcd := []string{"http://localhost:2379"}
 	nats := "nats://localhost:4222"
-	file := "chain.yaml"
+	file := "files/chain.yaml"
 	p, err := portal.New(file, nats, etcd)
 	if err != nil {
 		log.Fatal(err)
