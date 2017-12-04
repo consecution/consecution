@@ -5,14 +5,16 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/consecution/consecution/portal"
 )
 
 func main() {
-	etcd := []string{"http://localhost:2379"}
-	nats := "nats://localhost:4222"
-	file := "files/chain.yaml"
+	time.Sleep(5 * time.Second)
+	etcd := []string{"http://etcd:2379"}
+	nats := "nats://nats:4222"
+	file := "/files/chain.yaml"
 	p, err := portal.New(file, nats, etcd)
 	if err != nil {
 		log.Fatal(err)
