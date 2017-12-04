@@ -79,12 +79,12 @@ Each link in a chain references a Docker Image.  For each link it pulls the dock
 The runner then begins to bootstrap a queue of commands (currently set to 2) for each link.  It will natively containerize the command in the filesystem obtained from the docker image.  These commands are running and waiting for Stdin.  Native containerization is preferred for speed.Running this through the docker daemon (using the demo) was a difference between 1s execution for an entire chain vs 100ms.  
 
 ##### Execution
-When a request comes in from Nats, the runner finds the command queue by the link Id and pops off one from the queue and takes the input from nats and sends it to the command.  In another routine it starts up another command and adds it back to the queue to replace the used one. It collects the reponse from Stdout and sends it back to the reply topic on nats.
+When a request comes in from Nats, the runner finds the command queue by the link Id and pops off one from the queue and takes the input from nats and sends it to Stdin for the command.  In another routine it starts up another command and adds it back to the queue to replace the used one. It collects the reponse from Stdout and sends it back to the reply topic on nats.
 
 ## Demo
 ```
 docker-compose build .
-docker-compose run
+docker-compose up
 ```
 If everything is up and running
 
