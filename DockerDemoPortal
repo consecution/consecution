@@ -1,0 +1,15 @@
+# build stage
+FROM golang:1.8.5-jessie AS build-env
+ENV SRC_DIR=/go/src/github.com/consecution/consecution/
+RUN mkdir -p $SRC_DIR
+COPY . $SRC_DIR
+RUN curl https://glide.sh/get | sh
+WORKDIR $SRC_DIR
+RUN glide install
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo demo-portal.go
+
+# final stage
+FROM scratch
+COPY --from=build-env /go/src/github.com/consecution/consecution/demo-portal /
+COPY files/chain.yaml /files/chain.yaml
+ENTRYPOINT ["/demo-portal"]

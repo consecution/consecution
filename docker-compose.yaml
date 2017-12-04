@@ -1,0 +1,26 @@
+version: '2'
+services:
+  portal:
+    hostname: portal
+    build:
+      context: .
+      dockerfile: DockerDemoPortal
+    ports:
+      - '8080:8080'
+  runner:
+    hostname: runner
+    build:
+      context: .
+      dockerfile: DockerDemoRunner
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  etcd:
+    image: quay.io/coreos/etcd:v3.1
+    hostname: etcd
+    volumes:
+      - /usr/share/ca-certificates/:/etc/ssl/certs
+    command: "/usr/local/bin/etcd -advertise-client-urls http://etcd:2379 -listen-client-urls http://0.0.0.0:2379"
+  nats:
+    image: nats
+    hostname: nats
+

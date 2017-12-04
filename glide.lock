@@ -1,0 +1,29 @@
+hash: d4e0a09599e009996b3e5c37f06776e28a447ba280e29bacb22f679df9d28d5a
+updated: 2017-12-03T16:07:54.836322488-08:00
+imports:
+- name: github.com/coreos/etcd
+  version: 7e79c257cab156a511315b5e3459b4f88ecfe622
+  subpackages:
+  - client
+  - pkg/pathutil
+  - pkg/srv
+  - pkg/types
+  - version
+- name: github.com/coreos/go-semver
+  version: 8ab6407b697782a06568d4b7f1db25550ec2e4c6
+  subpackages:
+  - semver
+- name: github.com/nats-io/go-nats
+  version: f0d9c5988d4c2a17ad466fcdffe010165c46434e
+  subpackages:
+  - encoders/builtin
+  - util
+- name: github.com/nats-io/nuid
+  version: 33c603157d6fd1b0ac2599bcc4a286b36479a06d
+- name: github.com/ugorji/go
+  version: bdcc60b419d136a85cdf2e7cbcac34b3f1cd6e57
+  subpackages:
+  - codec
+- name: gopkg.in/yaml.v2
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+testImports: []

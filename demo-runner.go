@@ -6,13 +6,15 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/consecution/consecution/runner"
 )
 
 func main() {
-	etcd := []string{"http://localhost:2379"}
-	nats := "nats://localhost:4222"
+	time.Sleep(5 * time.Second)
+	etcd := []string{"http://etcd:2379"}
+	nats := "nats://nats:4222"
 	_, err := runner.New(nats, etcd)
 	if err != nil {
 		log.Fatal(err)
