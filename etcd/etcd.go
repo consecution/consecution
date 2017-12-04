@@ -3,6 +3,7 @@ package etcd
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/consecution/consecution/chain"
 	"github.com/coreos/etcd/client"
@@ -46,6 +47,7 @@ func (e Etcd) setLink(l chain.Link) error {
 	if err != nil {
 		return err
 	}
+	log.Print(y)
 	_, err = e.kapi.Set(context.Background(), fmt.Sprintf(worker, l.Id()), y, &client.SetOptions{PrevExist: client.PrevIgnore})
 	return err
 }

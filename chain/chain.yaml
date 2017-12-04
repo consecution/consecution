@@ -1,13 +1,13 @@
 Chain:
 - Image: 'busybox'
-  Command: 'cat'
+  Command: '\/bin\/cat'
   Name: 'cat'
   Constraints:
     Memory: 20
     CPU: 0.5
   Arguments:
 - Image: 'busybox'
-  Command: 'grep'
+  Command: '/bin/grep'
   Name: 'grep'
   Constraints:
     Memory: 20

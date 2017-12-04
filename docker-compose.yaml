@@ -9,6 +9,8 @@ services:
       - '8080:8080'
   runner:
     hostname: runner
+    depends_on:
+      - portal
     build:
       context: .
       dockerfile: DockerDemoRunner
@@ -21,6 +23,8 @@ services:
     hostname: etcd
     volumes:
       - /usr/share/ca-certificates/:/etc/ssl/certs
+    ports:
+      - '2379:2379'
     command: "/usr/local/bin/etcd -advertise-client-urls http://etcd:2379 -listen-client-urls http://0.0.0.0:2379"
   nats:
     image: nats

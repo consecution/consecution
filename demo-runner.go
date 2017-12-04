@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	time.Sleep(5 * time.Second)
+	time.Sleep(7 * time.Second)
 	etcd := []string{"http://etcd:2379"}
 	nats := "nats://nats:4222"
 	_, err := runner.New(nats, etcd)

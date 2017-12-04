@@ -2,11 +2,14 @@ package chain
 
 import (
 	"testing"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestFilterFile(t *testing.T) {
-	_, err := ChainFile("chain.yaml")
+	c, err := ChainFile("chain.yaml")
 	if err != nil {
 		t.Error(err)
 	}
+	spew.Dump(c)
 }

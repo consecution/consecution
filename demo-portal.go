@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	time.Sleep(5 * time.Second)
+	time.Sleep(3 * time.Second)
 	etcd := []string{"http://etcd:2379"}
 	nats := "nats://nats:4222"
 	file := "/files/chain.yaml"

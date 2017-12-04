@@ -158,6 +158,7 @@ type Command struct {
 func NewCommand(l chain.Link) (*Command, error) {
 	var c Command
 	var err error
+	log.Println(l.Command)
 	c.cmd = exec.Command(l.Command, l.Arguments...)
 	c.in, err = c.cmd.StdinPipe()
 	if err != nil {
@@ -181,7 +182,6 @@ func NewCommand(l chain.Link) (*Command, error) {
 		GidMappings: []syscall.SysProcIDMap{{ContainerID: 0, HostID: os.Getgid(), Size: 1}},
 		Chroot:      targetdir,
 	}
-	c.cmd.Dir = "/"
 	err = c.cmd.Start()
 	return &c, err
 
